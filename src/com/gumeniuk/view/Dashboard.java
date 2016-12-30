@@ -1,8 +1,11 @@
 package com.gumeniuk.view;
 
 import com.gumeniuk.adressbook.ContactManager;
+import com.gumeniuk.adressbook.type.Contact;
 import com.gumeniuk.builders.MenuBarBuilder;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.IOException;
 
@@ -13,7 +16,7 @@ public class Dashboard extends AbstractFrame {
         this.cm = cm;
 
         setTitle("Contacts");
-        setResizable(false);
+        setResizable(true);
         initLookAndFeel();
         setVisible(true);
     }
@@ -31,11 +34,49 @@ public class Dashboard extends AbstractFrame {
         return menuBarBuilder.build();
     }
 
+    private Component createTable() {
+
+        JTable table = new JTable(generateTableModel());
+
+        return new JScrollPane(table);
+    }
+
+    private DefaultTableModel generateTableModel() {
+        String[] col = {"ID", "Name", "Email", "Telephone"};
+        DefaultTableModel tableModel = new DefaultTableModel(col, 0) {
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                //all cells false
+                return false;
+            }
+        };
+
+        for (Contact contact : cm.getContacts()) {
+            Object[] obj = {
+                    contact.getId(),
+                    contact.getName(),
+                    contact.getEmail(),
+                    contact.getPhone()
+            };
+            tableModel.addRow(obj);
+        }
+
+        return tableModel;
+    }
+
+    private void reloadData() {
+        try {
+            cm.invoke();
+        } catch (IOException | ClassNotFoundException e) {
+            showError("Error", e.getMessage());
+        }
+    }
+
     @Override
     protected void onInit() {
         add(createMenu(), BorderLayout.NORTH);
-//
-//        add(createGameField(), BorderLayout.CENTER);
+        add(createTable(), BorderLayout.CENTER);
         pack();
     }
 
@@ -54,11 +95,7 @@ public class Dashboard extends AbstractFrame {
                 dispose();
                 break;
             case "Reload":
-                try {
-                    cm.invoke();
-                } catch (IOException | ClassNotFoundException e) {
-                    showError("Error", e.getMessage());
-                }
+                reloadData();
                 break;
             case "Save all":
                 try {
