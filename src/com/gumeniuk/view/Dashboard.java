@@ -5,6 +5,7 @@ import com.gumeniuk.builders.MenuBarBuilder;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class Dashboard extends AbstractFrame {
@@ -59,10 +60,18 @@ public class Dashboard extends AbstractFrame {
         }
     }
 
+    private Component createCreateButton(){
+        JButton btn = new JButton("Create");
+        btn.addActionListener(getActionListenerImpl());
+
+        return btn;
+    }
+
     @Override
     protected void onInit() {
         add(createMenu(), BorderLayout.NORTH);
         add(contactTablePane, BorderLayout.CENTER);
+        add(createCreateButton(), BorderLayout.SOUTH);
         pack();
     }
 
@@ -71,6 +80,16 @@ public class Dashboard extends AbstractFrame {
         try {
             cm.dump();
         } catch (IOException ignore) {
+        }
+    }
+
+    @Override
+    protected void onButtonClick(JButton btn) {
+        System.out.println("foo");
+        if (btn.getText() == "Create") {
+            ContactPanelCreate ctnpe = new ContactPanelCreate(contactTableBuilder);
+            ctnpe.pack();
+            ctnpe.setVisible(true);
         }
     }
 

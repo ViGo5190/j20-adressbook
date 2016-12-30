@@ -36,7 +36,6 @@ class AbstractFrame extends JFrame {
 
     protected static void initLookAndFeel() {
         try {
-
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             setLookAndFeel(getSystemLookAndFeelClassName());
         } catch (UnsupportedLookAndFeelException | ReflectiveOperationException ignore) {
