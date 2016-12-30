@@ -16,7 +16,7 @@ public class Dashboard extends AbstractFrame {
 
     public Dashboard(ContactManager cm) throws HeadlessException {
         this.cm = cm;
-        this.contactTableBuilder = new ContactTableUtil(cm);
+        this.contactTableBuilder = new ContactTableUtil(this);
         contactTablePane = createTablePane();
 
         setTitle("Contacts");

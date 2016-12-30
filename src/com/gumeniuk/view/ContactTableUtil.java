@@ -13,8 +13,11 @@ public class ContactTableUtil {
     private ContactManager cm;
     private JTable table;
 
-    public ContactTableUtil(ContactManager cm) {
-        this.cm = cm;
+    private JFrame dashboard;
+
+    public ContactTableUtil(JFrame dashboard) {
+        this.dashboard = dashboard;
+        this.cm = ContactManager.getInstance();
     }
 
     private DefaultTableModel tableModel = new DefaultTableModel() {
@@ -82,14 +85,44 @@ public class ContactTableUtil {
         return this;
     }
 
+    private ContactTableUtil initTableEvents(){
+        initTable();
+
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = table.rowAtPoint(evt.getPoint());
+                int col = table.columnAtPoint(evt.getPoint());
+                if (row >= 0 && col >= 0) {
+                    int id = (int) tableModel.getValueAt(row,0);
+                    onClickCell(id);
+                }
+            }
+        });
+        return this;
+    }
+
+    public void onClickCell(int id){
+        ContactPanelEdit ctnpe = new ContactPanelEdit(id, this);
+        ctnpe.pack();
+        ctnpe.setVisible(true);
+    }
+
     public JTable getTable() {
         initTable();
+        initTableEvents();
         return table;
+    }
+
+    public void onChangeData() throws IOException{
+        fillTableWithContacts();
+        tableModel.fireTableDataChanged();
+        cm.dump();
     }
 
     public void reloadData() throws IOException, ClassNotFoundException {
         cm.invoke();
-        fillTableWithContacts();
-        tableModel.fireTableDataChanged();
+        onChangeData();
+
     }
 }

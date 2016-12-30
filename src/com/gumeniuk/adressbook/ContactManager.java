@@ -44,6 +44,10 @@ public class ContactManager {
         return contactArrayList;
     }
 
+    public Contact getContactById(int id){
+        return contacts.get(id);
+    }
+
     public ContactManager dump() throws IOException {
         reader.writeObj(contacts);
 
