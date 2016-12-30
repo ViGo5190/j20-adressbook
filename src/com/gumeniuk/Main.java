@@ -11,7 +11,7 @@ public class Main {
         ContactManager cm = ContactManager.getInstance();
         cm.invoke();
         Contact c1 = new Contact(1, "name1", "email1", "phone1");
-        Contact c2 = new Contact(2, "name2", "email2", "phone2");
+        Contact c2 = new Contact("name2", "email2", "phone2");
         cm.addContact(c1);
         cm.addContact(c2);
 

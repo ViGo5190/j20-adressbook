@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class ContactManager {
-    private HashMap<Integer, Contact> contacts = new HashMap<>();
+    private ContactsMap contacts = new ContactsMap();
     private static Reader reader;
     private static ContactManager cm;
 
@@ -24,26 +24,36 @@ public class ContactManager {
         return cm;
     }
 
-    public void addContact(Contact contact) {
+    public ContactManager addContact(Contact contact) {
+        if (contact.getId() == 0) {
+            contact.setId(this.getContactsCount() + 1);
+
+        }
         this.contacts.put(contact.getId(), contact);
+
+        return this;
     }
 
     public ArrayList<Contact> getContacts() {
         Iterator it = contacts.entrySet().iterator();
-        ArrayList<Contact> c = new ArrayList<>();
+        ArrayList<Contact> contactArrayList = new ArrayList<>();
         while (it.hasNext()) {
             Map.Entry me = (Map.Entry) it.next();
-            c.add((Contact) me.getValue());
+            contactArrayList.add((Contact) me.getValue());
         }
-        return c;
+        return contactArrayList;
     }
 
-    public void dump() throws IOException {
+    public ContactManager dump() throws IOException {
         reader.writeObj(contacts);
+
+        return this;
     }
 
-    public void invoke() throws IOException, ClassNotFoundException {
+    public ContactManager invoke() throws IOException, ClassNotFoundException {
         contacts = reader.readObj();
+
+        return this;
     }
 
     public int getContactsCount() {
