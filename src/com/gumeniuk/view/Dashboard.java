@@ -1,19 +1,23 @@
 package com.gumeniuk.view;
 
 import com.gumeniuk.adressbook.ContactManager;
-import com.gumeniuk.adressbook.type.Contact;
 import com.gumeniuk.builders.MenuBarBuilder;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.IOException;
 
 public class Dashboard extends AbstractFrame {
     private ContactManager cm;
 
+    private JTable contactTable;
+    private Component contactTablePane;
+    private ContactTableUtil contactTableBuilder;
+
     public Dashboard(ContactManager cm) throws HeadlessException {
         this.cm = cm;
+        this.contactTableBuilder = new ContactTableUtil(cm);
+        contactTablePane = createTablePane();
 
         setTitle("Contacts");
         setResizable(true);
@@ -34,40 +38,22 @@ public class Dashboard extends AbstractFrame {
         return menuBarBuilder.build();
     }
 
-    private Component createTable() {
+    private Component createTablePane() {
 
-        JTable table = new JTable(generateTableModel());
-
-        return new JScrollPane(table);
-    }
-
-    private DefaultTableModel generateTableModel() {
         String[] col = {"ID", "Name", "Email", "Telephone"};
-        DefaultTableModel tableModel = new DefaultTableModel(col, 0) {
 
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                //all cells false
-                return false;
-            }
-        };
+        contactTable = contactTableBuilder
+                .setModelColumns(col)
+                .fillTableWithContacts()
+                .getTable();
 
-        for (Contact contact : cm.getContacts()) {
-            Object[] obj = {
-                    contact.getId(),
-                    contact.getName(),
-                    contact.getEmail(),
-                    contact.getPhone()
-            };
-            tableModel.addRow(obj);
-        }
-
-        return tableModel;
+        return new JScrollPane(contactTable);
     }
 
     private void reloadData() {
         try {
-            cm.invoke();
+            contactTableBuilder.reloadData();
+            System.out.println(cm.getContactsCount());
         } catch (IOException | ClassNotFoundException e) {
             showError("Error", e.getMessage());
         }
@@ -76,7 +62,7 @@ public class Dashboard extends AbstractFrame {
     @Override
     protected void onInit() {
         add(createMenu(), BorderLayout.NORTH);
-        add(createTable(), BorderLayout.CENTER);
+        add(contactTablePane, BorderLayout.CENTER);
         pack();
     }
 
